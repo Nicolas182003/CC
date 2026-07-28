@@ -4,7 +4,8 @@ Documento de continuidad. Qué está hecho, qué se decidió y por qué, y qué 
 
 > **El sistema funciona de punta a punta y está probado contra Outlook real.**
 > 164 tests automatizados en verde, más una prueba de carga de 20 alertas contra
-> Outlook real. Falta desplegarlo en el equipo del técnico.
+> Outlook real. **El código ya está en el repositorio privado.** Falta un solo
+> paso: desplegarlo en el equipo del técnico siguiendo `DESPLIEGUE.md`.
 
 ---
 
@@ -381,6 +382,25 @@ sistema de pagos. Causas más probables, en orden:
 factura le llega a quien puso la tarjeta.
 
 Esto **solo bloquea la traducción del PDF**. Todo lo demás funciona.
+
+### Lo que se cerró el 28 de julio
+
+- **El código está subido**, 56 archivos en `main`. Verificado contra el remoto que
+  no viajó nada sensible: sin `Imagenes/`, sin `.env`, sin `state/`, sin `archive/`.
+- **`state/`, `logs/` y `archive/` se generan solas** en la primera corrida.
+  Comprobado con una copia limpia que solo tenía `src`, `config`, `templates` y
+  `.env`: bastó un comando para que apareciera `state/events.db` con su esquema
+  vacío. **No deben copiarse entre máquinas**: `ledger.db` es específico de cada
+  buzón, y un Message-ID heredado marcaría una alarma real como ya procesada.
+- **La caché de frases es local a cada máquina.** En el equipo del técnico arranca
+  vacía, así que las primeras alarmas vuelven a preguntarle a Gemini; desde ahí la
+  redacción queda congelada. Si algún día se corriera en dos equipos, las
+  redacciones podrían divergir, y la solución sería copiar `events.db`, no
+  rehacerlo.
+- **Documentación y configuración quedaron sin datos identificables**: cero
+  nombres de personas, cero correos, cero clientes, cero números de serie reales.
+- **Código muerto eliminado:** `templates/alert_email.html.j2`, sobrante del diseño
+  en que una alarma era un correo.
 
 ### Por hacer, en orden
 
