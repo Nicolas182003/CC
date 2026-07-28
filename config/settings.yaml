@@ -1,0 +1,154 @@
+outlook:
+  # Inbox subfolders where the native Outlook rules drop Clariot alerts.
+  # Nested paths are written with "/", e.g. "Clientes/Clariot".
+  source_folders:
+    - "Clariot"
+  # Also scan everything nested under each source folder. Leave this on so new
+  # subfolders start working without editing this file.
+  include_subfolders: true
+  # Where processed originals are moved. Created automatically if missing.
+  # Leave empty to keep originals in place (only marked as read).
+  processed_folder: "Procesados"
+  # Weekly reports wait here for the technician. Empty means the account's
+  # default Drafts folder.
+  draft_folder: "Por enviar"
+  # Urgency reports go to their own folder, so what has to go out today is
+  # visible at a glance and does not get lost among the weekly ones.
+  urgent_draft_folder: "Urgencias"
+  # Where draft_folder lives: "drafts" (a subfolder of Drafts, recommended for
+  # unsent mail) or "inbox".
+  draft_folder_parent: "drafts"
+  mark_as_read: true
+  # Skip messages larger than this; guards against unexpected bulk attachments.
+  max_attachment_mb: 20
+
+translation:
+  # Who translates the attached PDF:
+  #   none    - no translation; the draft carries the original report.
+  #             Lets the Outlook side be tested with no account and no cost.
+  #   google  - Google Cloud Translation v3. Billed per page (~USD 0.08), and
+  #             these reports are one page. Recommended.
+  #   deepl   - DeepL Documents. Bills a 50,000-character minimum per file, which
+  #             is roughly 16x the real content of these reports.
+  provider: "none"
+
+  target_lang: "ES"
+  # Empty means auto-detect, which handles reports that already arrive in Spanish.
+  source_lang: ""
+
+  google:
+    # Document translation is not served from the 'global' endpoint.
+    location: "us-central1"
+
+  # DeepL only. One of: default, more, less.
+  formality: "more"
+
+  # Attach the untranslated report alongside the translated one. Off by default:
+  # two copies of the same report confuses the client, and it multiplies with
+  # every alarm the draft carries. Turn it on if they ask for the original.
+  attach_original: false
+
+paths:
+  work_dir: ".work"
+  archive_dir: "archive"
+  ledger_db: "state/ledger.db"
+  audit_csv: "archive/audit.csv"
+  log_file: "logs/clariot.log"
+
+email:
+  # Available placeholders: {machine}, {company}
+  subject_template: "[ALERTA TECNICA] Reporte de Estado - {machine}"
+  critical_subject_prefix: "[CRITICO] "
+  # Drafts normally have no recipient by design: the technician adds it. Leave
+  # this empty so the subject stays clean. Outlook refuses to send a message
+  # without a recipient, so nothing can slip through half-finished.
+  unknown_client_subject_prefix: ""
+  # Placeholder for the contact name, which the technician types over.
+  greeting_placeholder: "[NOMBRE]"
+  # Kept static on purpose: the draft is written by the script at one hour and
+  # sent by the technician at another, so a time-based greeting would often lie.
+  greeting: "Buenos días"
+  # Mini report inside the body: equipment, problem, recommended action and
+  # deadline. Needed because the attached PDF keeps its original language.
+  # Set to false to send only the plain wording the team uses today.
+  include_report: true
+  # SMTP address of the account to send from. Empty means the default account.
+  sender_account: ""
+  signature_team: "Equipo Emeltec Chile"
+
+glossary:
+  # Who translates a phrase the glossary does not cover:
+  #   none    - nobody. Only approved wording is ever used.
+  #   gemini  - AI Studio key, free and no credit card. What travels is a generic
+  #             template sentence with no client, plant, machine or serial in it.
+  #   google  - Cloud Translation, needs the same billing as the PDF translation.
+  # Whatever answers is cached, so a phrase is translated once and then reused
+  # forever. That is what keeps the wording identical across reports.
+  phrase_provider: "gemini"
+  # Model for phrase_provider: gemini. An alias rather than a pinned version:
+  # Google retires specific names, and a dead model would silently stop
+  # translation on a machine nobody administers.
+  gemini_model: "gemini-flash-latest"
+
+  # What happens when a report uses a phrase the glossary does not cover:
+  #   hold - NO draft is created. The alarm waits, and the next run builds the
+  #          draft once the phrase is added. The client can never receive
+  #          untranslated text, because the email does not exist yet.
+  #   mark - the draft is created with [TRADUCIR] in the subject and the English
+  #          highlighted, for the technician to fix before sending.
+  on_missing: "hold"
+  # Urgent and critical alarms are never held: delaying a safety alarm because a
+  # phrase is missing from a dictionary is worse than a draft that needs fixing.
+  never_hold_urgent: true
+
+grouping:
+  # Days within which two events on the same machine are the same problem.
+  # Known limit: a pump alarming every 10 days will not be grouped.
+  window_days: 7
+  # Events on the same machine within one calendar day: critical level. The
+  # equipment is degrading now, not merely misbehaving persistently.
+  same_day_is_critical: true
+  # Events on the same machine that trigger an urgency report.
+  urgent_threshold: 2
+  # One urgency report per machine per this many days, so the client is not
+  # emailed daily about the same pump. Later alarms join the weekly report.
+  urgency_cooldown_days: 7
+  # How long reported events are kept before being purged.
+  retention_days: 180
+
+reports:
+  # What happens with an isolated alarm:
+  #   draft  - its own draft right away, in outlook.draft_folder. The technician
+  #            and sends it when he gets to it. One email per alarm.
+  #   weekly - accumulates and goes out with `--report` on Friday, one email per
+  #            client. Fewer emails, but the client waits.
+  single_alarm: "draft"
+
+  # Placeholders: {machine} {count} {period} {date} {company} {plant}
+  critical_subject: "[CRITICO] {machine} - {count} alarmas el {date}"
+  urgent_subject: "[URGENTE] {machine} - {count} alarmas ({period})"
+  normal_subject: "Reporte de monitoreo - {machine} - {date}"
+  weekly_subject: "Informe semanal de monitoreo - {company} - {period}"
+
+  # Colour of the section headers in the email body, as hex. Everything else in
+  # the layout derives from it, so this single line rebrands both reports.
+  #
+  # #005f7f is PANTONE 7707C, Emeltec's principal corporate colour per its brand
+  # manual. Its companion there is PANTONE COOL GRAY 7C (#98989a), which the
+  # templates use for rules and secondary text.
+  brand_color: "#005f7f"
+  # Empty block the technician fills before sending. It is the only place in the
+  # report where Emeltec's own judgement appears, and what turns a forwarded
+  # machine output into an engineering service.
+  include_emeltec_note: true
+
+urgency:
+  # Values that trigger the critical prefix and the critical CC list.
+  # Compared case- and accent-insensitively.
+  critical_values:
+    - "CRITICAL"
+    - "CRITICA"
+    - "HIGH"
+    - "ALTA"
+    - "URGENT"
+    - "URGENTE"

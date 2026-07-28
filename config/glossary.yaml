@@ -1,0 +1,96 @@
+# Approved Spanish wording for the phrases these reports use.
+#
+# Why a glossary instead of a translation API:
+#
+# Clariot / Alfa Laval reports are generated from templates, so the wording comes
+# from a closed catalogue. A generic machine translator handles that badly and,
+# worse, inconsistently: in a real test the same word "looseness" came back as
+# "carga", "seguridad", "relajación" and "debilidad" in four sentences, and
+# "misalignment" became "malignación", which is not a Spanish word.
+#
+# A glossary gives the opposite: wording approved once by Emeltec's own
+# engineers, identical in every report, for free, offline, and with no client
+# data leaving the company.
+#
+# HOW TO GROW IT
+# Anything not listed here is left in English and marked "[EN]" in the draft, so
+# the technician cannot miss it. He translates it once, you add the pair here,
+# and that phrase is solved forever. Coverage converges after a few weeks.
+#
+# Matching ignores case, accents, extra spaces and a trailing period.
+
+# Fields whose values come from the report's catalogue and should be translated.
+# Names, plants, dates and serial numbers are deliberately absent: they must not
+# be touched.
+translatable_fields:
+  - event_type
+  - equipment_status
+  - possible_cause
+  - recommended_action
+  - urgency
+  - machine_type
+
+# English phrase -> approved Spanish.
+phrases:
+  # ==========================================================================
+  # VERIFICADO contra un reporte real de Alfa Laval (24-07-2026).
+  # Estas frases se extrajeron del PDF original en inglés, tal cual llegan.
+  # ==========================================================================
+
+  # Tipo de máquina — ojo con el guion bajo, viene así en el PDF
+  "Centrifugal_pump": "Bomba centrífuga"
+
+  # Tipo de evento
+  "Mechanical": "Mecánico"
+  "Bearing wear": "Desgaste de rodamiento"
+
+  # Estado del equipo
+  "Potential impeller damage or imbalance.":
+    "Posible daño o desbalanceo del impulsor."
+
+  # Causa probable
+  "Can sometimes be caused by a foreign object passing through the pump. Pump performance may be reduced and long term vibrations will damage the pump.":
+    "Puede deberse al paso de un objeto extraño por la bomba. El rendimiento de la bomba puede verse reducido, y las vibraciones prolongadas la dañarán."
+
+  # Acción recomendada
+  "Open pump and check impeller for any damage. Perform corrective action if necessary.":
+    "Abrir la bomba y revisar el impulsor para detectar daños. Realizar las acciones correctivas que correspondan."
+
+  # Urgencia
+  "Perform check at next planned stop of the pump.":
+    "Realizar la revisión en la próxima parada programada de la bomba."
+
+  # ==========================================================================
+  # SIN VERIFICAR. Reconstruidas a partir de un reporte que ya había pasado por
+  # el traductor de Google, así que el inglés original puede estar redactado
+  # distinto. Confirmar cada par la primera vez que aparezca la alerta.
+  # ==========================================================================
+
+  "Centrifugal pump": "Bomba centrífuga"
+  "Within 3 to 5 days.": "En un plazo de 3 a 5 días."
+  "Immediate action required": "Requiere acción inmediata"
+  "Installation or mechanical related": "Relacionado con instalación o mecánica"
+  "Looseness or installation problem.": "Problema de holgura o instalación."
+
+  "The system has detected a possible looseness or installation problem. Prolonged vibrations will damage the pump.":
+    "El sistema ha detectado una posible holgura o un problema de instalación. Las vibraciones prolongadas dañarán la bomba."
+
+  "Check visually the condition with the pump running. Make sure each of the four feet is evenly supported on the floor. Pay close attention to the piping for any signs of looseness or excessive strain. Take corrective action if necessary.":
+    "Verifique visualmente el estado con la bomba en marcha. Asegúrese de que cada uno de los cuatro pies apoye de forma uniforme sobre el piso. Preste especial atención a las tuberías para detectar indicios de holgura o tensión excesiva. Realice las acciones correctivas que correspondan."
+
+# Reference list for the technician when adding new phrases. Not applied
+# automatically: swapping single words inside an English sentence produces
+# Spanglish, so only whole phrases are translated.
+terms:
+  "looseness": "holgura"
+  "misalignment": "desalineación"
+  "drive end": "lado acople"
+  "non-drive end": "lado libre"
+  "bearing wear": "desgaste de rodamiento"
+  "imbalance": "desbalanceo"
+  "cavitation": "cavitación"
+  "shaft": "eje"
+  "impeller": "impulsor"
+  "coupling": "acoplamiento"
+  "vibration velocity": "velocidad de vibración"
+  "overall vibration": "vibración global"

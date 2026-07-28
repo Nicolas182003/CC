@@ -1,0 +1,264 @@
+{# Outlook renders with the Word engine: tables for layout, inline styles only.
+   No flexbox, no grid, no border-radius, no box-shadow, no <style> block and no
+   external stylesheet — all of those are ignored or stripped. Inline styles on
+   cells are not optional here, they are the only mechanism that works.
+
+   WIDTH. Every table declares the same width as an HTML attribute *and* as a
+   style. The attribute is what the Word engine honours; with only the CSS, each
+   block collapsed to its own content width and a real email went out with the
+   EQUIPO card narrow and the alarm card wide.
+
+   PALETTE, from the Emeltec brand manual:
+     brand           PANTONE 7707C        #005f7f   principal, in settings.yaml
+     rule / soft     PANTONE COOL GRAY 7C #98989a   companion, as tints
+   Cool Gray appears as a light tint for the rules and a dark one for small text,
+   not at full strength: on white it gives about 3:1 of contrast, under the 4.5:1
+   that small text needs to stay readable.
+
+   The severity colours are NOT brand colours. Red and amber for alarm levels are
+   a universal convention and the manual defines no severity palette, so they live
+   apart from `brand` to make clear they signal a level, not an identity.
+
+   Every colour is declared below. None is buried further down the file. #}
+{% set critical_color = '#c00000' %}
+{% set panel_color = '#4a4a4c' %}
+{% set action_color = '#1e6b34' %}
+{% set action_bg = '#f5faf6' %}
+{% set urgent_color = '#a85400' %}
+{% set accent = critical_color if critical else (urgent_color if urgent else brand) %}
+{% set rule = '#d9d9db' %}
+{% set tint = '#fafafa' %}
+{% set soft = '#6b6b6d' %}
+{% set width = 660 %}
+<div style="font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.5; color: #202020;">
+{% if missing_phrases %}
+  {# A safety alarm is never delayed over a dictionary gap, so this draft may
+     carry English. The banner has to be removed by hand before sending, which
+     makes it impossible to miss. #}
+  <table cellpadding="0" cellspacing="0" border="0" width="{{ width }}"
+         style="border-collapse: collapse; width: {{ width }}px; max-width: 100%; margin: 0 0 24px 0;">
+    <tr>
+      <td style="background-color: #c00000; color: #ffffff; padding: 14px 18px; font-size: 11pt; line-height: 1.5;">
+        <strong>NO ENVIAR ASÍ — FALTA TRADUCIR</strong><br>
+        Este borrador contiene texto en inglés porque el glosario no cubre
+        {{ missing_phrases|length }} frase{{ 's' if missing_phrases|length > 1 else '' }}:
+        <ul style="margin: 8px 0 8px 20px; padding: 0;">
+{% for phrase in missing_phrases %}
+          <li style="margin: 0 0 4px 0;">{{ phrase }}</li>
+{% endfor %}
+        </ul>
+        Traducila, agregala a <code>config\glossary.yaml</code>, y borrá este
+        aviso antes de enviar.
+      </td>
+    </tr>
+  </table>
+{% endif %}
+
+  <p style="margin: 0 0 14px 0;">{{ greeting }} {{ client_name }},</p>
+
+{% if critical %}
+  <p style="margin: 0 0 16px 0;">
+    Junto con saludar, informamos que hemos registrado
+    <strong>{{ summary.count }} alarmas en el mismo equipo durante el mismo día</strong>,
+    lo que indica una condición que está evolucionando. Recomendamos verificación
+    en terreno a la brevedad.
+  </p>
+{% elif summary.repeated %}
+  <p style="margin: 0 0 16px 0;">
+    Junto con saludar, hemos revisado el reporte de alarmas generado por sus
+    equipos y detectamos <strong>{{ summary.count }} alarmas reiteradas en un
+    mismo equipo</strong>. La repetición sugiere una condición persistente que
+    requiere atención y verificación en terreno.
+  </p>
+{% elif urgent %}
+  <p style="margin: 0 0 16px 0;">
+    Junto con saludar, hemos revisado el reporte de alarmas generado por sus
+    equipos y detectamos un evento clasificado como urgente, que requiere
+    atención y verificación en terreno.
+  </p>
+{% else %}
+  <p style="margin: 0 0 16px 0;">
+    Junto con saludar, hemos revisado el reporte de alarmas generado por el
+    sistema de monitoreo en sus equipos y le informamos el siguiente evento, con
+    el detalle de la condición detectada y la acción recomendada.
+  </p>
+{% endif %}
+
+{% if already_reported %}
+  {# Explains the severity without resending what the client already got. #}
+  <table cellpadding="0" cellspacing="0" border="0" width="{{ width }}"
+         style="border-collapse: collapse; width: {{ width }}px; max-width: 100%; margin: 0 0 20px 0;">
+    <tr>
+      <td style="border-left: 4px solid {{ accent }}; background-color: #f7f7f7;
+                 padding: 12px 16px; font-size: 10.5pt; line-height: 1.5;">
+        Este equipo acumula <strong>{{ summary.count }} alarmas</strong> desde el
+        {{ first_date }}.
+        {% if already_reported == 1 %}
+          La primera ya fue informada;
+        {% else %}
+          Las {{ already_reported }} anteriores ya fueron informadas;
+        {% endif %}
+        a continuación el detalle de
+        {% if new_count == 1 %}la nueva{% else %}las {{ new_count }} nuevas{% endif %}.
+      </td>
+    </tr>
+  </table>
+{% endif %}
+
+  <table cellpadding="0" cellspacing="0" border="0" width="{{ width }}"
+         style="border-collapse: collapse; width: {{ width }}px; max-width: 100%; margin: 0 0 22px 0;">
+    <tr>
+      <td colspan="2" style="background-color: {{ brand }}; color: #ffffff; padding: 10px 16px;
+                             font-size: 9.5pt; font-weight: bold; letter-spacing: 1px;">
+        EQUIPO
+      </td>
+    </tr>
+{% for label, value in identification %}
+    <tr>
+      <td width="170" style="border: 1px solid {{ rule }}; border-top: none; padding: 11px 16px;
+                 background-color: {{ tint }}; font-size: 10pt; width: 170px;
+                 color: {{ soft }}; vertical-align: top;">{{ label }}</td>
+      <td style="border: 1px solid {{ rule }}; border-top: none; border-left: none;
+                 padding: 11px 16px; font-size: 10pt; vertical-align: top;">{{ value }}</td>
+    </tr>
+{% endfor %}
+  </table>
+
+  <table cellpadding="0" cellspacing="0" border="0" width="{{ width }}"
+         style="border-collapse: collapse; width: {{ width }}px; max-width: 100%; margin: 0 0 22px 0;">
+    <tr>
+      <td colspan="3" style="background-color: {{ accent }}; color: #ffffff; padding: 10px 16px;
+                             font-size: 9.5pt; font-weight: bold; letter-spacing: 1px;">
+{% if already_reported %}
+        {{ new_count }} ALARMA{{ 'S' if new_count > 1 else '' }} NUEVA{{ 'S' if new_count > 1 else '' }}
+{% else %}
+        {{ summary.count }} ALARMA{{ 'S' if summary.count > 1 else '' }} · {{ period }}
+{% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td width="150" style="border: 1px solid {{ rule }}; border-top: none; padding: 8px 16px;
+                 background-color: {{ tint }}; font-size: 8.5pt; letter-spacing: 0.5px;
+                 color: {{ soft }}; width: 150px;">FECHA</td>
+      <td width="200" style="border: 1px solid {{ rule }}; border-top: none; border-left: none;
+                 padding: 8px 16px; background-color: {{ tint }}; font-size: 8.5pt;
+                 letter-spacing: 0.5px; color: {{ soft }}; width: 200px;">TIPO</td>
+      <td style="border: 1px solid {{ rule }}; border-top: none; border-left: none;
+                 padding: 8px 16px; background-color: {{ tint }}; font-size: 8.5pt;
+                 letter-spacing: 0.5px; color: {{ soft }};">URGENCIA SEGÚN EL REPORTE</td>
+    </tr>
+{% for item in timeline %}
+    <tr>
+      <td style="border: 1px solid {{ rule }}; border-top: none; padding: 11px 16px;
+                 font-size: 10pt; white-space: nowrap; vertical-align: top;">{{ item.date }}</td>
+      <td style="border: 1px solid {{ rule }}; border-top: none; border-left: none;
+                 padding: 11px 16px; font-size: 10pt; vertical-align: top;">{{ item.event_type }}</td>
+      <td style="border: 1px solid {{ rule }}; border-top: none; border-left: none;
+                 padding: 11px 16px; font-size: 10pt; vertical-align: top;">{{ item.urgency }}</td>
+    </tr>
+{% endfor %}
+  </table>
+
+{# One block per distinct condition, not one per alarm and not only the latest.
+   A machine repeating the same looseness three times gets that condition once
+   with its three dates; a machine reporting looseness and then a bearing gets
+   two blocks. Showing only the latest used to hide the earlier condition
+   entirely whenever the failures differed. #}
+{% if details|length > 1 %}
+  <p style="margin: 0 0 4px 0; font-size: 10pt; color: {{ soft }};">
+    Se detectaron <strong>{{ details|length }} condiciones distintas</strong> en
+    este equipo. El detalle de cada una:
+  </p>
+{% endif %}
+{% for detail in details %}
+  <table cellpadding="0" cellspacing="0" border="0" width="{{ width }}"
+         style="border-collapse: collapse; width: {{ width }}px; max-width: 100%; margin: 0 0 22px 0;">
+    <tr>
+      <td style="background-color: {{ brand }}; color: #ffffff; padding: 10px 16px;
+                 font-size: 9.5pt; font-weight: bold; letter-spacing: 1px;">
+        QUÉ INDICA EL MONITOREO
+{% if details|length > 1 or detail.count > 1 %}
+        · {{ detail.event_type|upper }}
+{% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid {{ rule }}; border-top: none; padding: 8px 16px;
+                 background-color: {{ tint }}; font-size: 9pt; color: {{ soft }};">
+{% if detail.count > 1 %}
+        {{ detail.count }} alarmas · {{ detail.when }}
+{% else %}
+        {{ detail.when }}
+{% endif %}
+      </td>
+    </tr>
+{% if detail.equipment_status %}
+    <tr>
+      <td style="border: 1px solid {{ rule }}; border-top: none; padding: 13px 16px;
+                 font-size: 10pt; line-height: 1.6;">
+        <strong style="color: {{ soft }};">Estado del equipo</strong><br>
+        {{ detail.equipment_status }}
+      </td>
+    </tr>
+{% endif %}
+{% if detail.possible_cause %}
+    <tr>
+      <td style="border: 1px solid {{ rule }}; border-top: none; padding: 13px 16px;
+                 font-size: 10pt; line-height: 1.6;">
+        <strong style="color: {{ soft }};">Causa probable</strong><br>
+        {{ detail.possible_cause }}
+      </td>
+    </tr>
+{% endif %}
+{% if detail.recommended_action %}
+    <tr>
+      <td style="border: 1px solid {{ rule }}; border-top: none;
+                 border-left: 4px solid {{ action_color }}; padding: 13px 16px;
+                 font-size: 10pt; line-height: 1.6; background-color: {{ action_bg }};">
+        <strong style="color: {{ action_color }};">Acción recomendada por el monitoreo</strong><br>
+        {{ detail.recommended_action }}
+      </td>
+    </tr>
+{% endif %}
+  </table>
+{% endfor %}
+
+{% if emeltec_note %}
+  <table cellpadding="0" cellspacing="0" border="0" width="{{ width }}"
+         style="border-collapse: collapse; width: {{ width }}px; max-width: 100%; margin: 0 0 22px 0;">
+    <tr>
+      <td style="background-color: {{ panel_color }}; color: #ffffff; padding: 10px 16px;
+                 font-size: 9.5pt; font-weight: bold; letter-spacing: 1px;">
+        RECOMENDACIÓN DE EMELTEC
+      </td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid {{ rule }}; border-top: none; padding: 16px;
+                 font-size: 10pt; line-height: 1.6;">
+        [COMPLETAR]
+      </td>
+    </tr>
+  </table>
+{% endif %}
+
+  <p style="margin: 0 0 14px 0;">Quedamos atentos a sus comentarios.</p>
+
+  <p style="margin: 0 0 20px 0;">
+    Saludos cordiales,<br>
+    {{ signature_team }}
+  </p>
+
+{% if attachment_count %}
+  <table cellpadding="0" cellspacing="0" border="0" width="{{ width }}"
+         style="border-collapse: collapse; width: {{ width }}px; max-width: 100%; margin: 0;">
+    <tr>
+      <td style="border-top: 1px solid {{ rule }}; padding: 12px 0 0 0;
+                 font-size: 9pt; color: {{ soft }}; line-height: 1.5;">
+        Se adjunta{{ 'n' if attachment_count > 1 else '' }} {{ attachment_count }}
+        reporte{{ 's' if attachment_count > 1 else '' }} original{{ 'es' if attachment_count > 1 else '' }}
+        del sistema de monitoreo.
+      </td>
+    </tr>
+  </table>
+{% endif %}
+</div>

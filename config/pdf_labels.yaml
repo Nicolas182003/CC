@@ -1,0 +1,80 @@
+# Label aliases used to pull key/value pairs out of the Clariot report.
+#
+# Calibrated against a real Alfa Laval "Informe de incidentes".
+# That report uses two layouts at once, and the parser handles both:
+#
+#   * label above, value below   (COMPAÑÍA / NOMBRE DE LA MÁQUINA row)
+#   * label left, value right    (Tipo de evento, Urgencia, ...)
+#
+# Matching is case- and accent-insensitive and ignores a trailing colon, so
+# "NOMBRE DE LA MÁQUINA:" matches the entry "NOMBRE DE LA MAQUINA".
+#
+# The incoming reports are in English; the Spanish spellings are kept because the
+# same generator produces both. When a new wording appears, add it here rather
+# than touching code.
+
+fields:
+  company:
+    - "COMPANY"
+    - "COMPANIA"
+    - "CUSTOMER"
+  plant:
+    - "PLANT"
+    - "PLANTA"
+  # Section, channel and sales office are not used in the email, but they must
+  # be listed: a header the parser does not recognise gets mistaken for the
+  # value of the column to its left.
+  section:
+    - "SECTION"
+    - "SECCION"
+  channel:
+    - "CHANNEL"
+    - "CANAL"
+  sales_office:
+    - "SALES OFFICE"
+    - "OFICINA DE VENTAS"
+  machine:
+    - "MACHINE NAME"
+    - "NOMBRE DE LA MAQUINA"
+    - "EQUIPMENT"
+    - "EQUIPO"
+  machine_type:
+    - "MACHINE TYPE"
+    - "TIPO DE MAQUINA"
+  serial_number:
+    - "SERIAL NUMBER"
+    - "NUMERO DE SERIE"
+  sensor_id:
+    - "SENSOR ID"
+    - "ID DEL SENSOR"
+  event_date:
+    # Verified against a real report: the label is "Time Of Event (UTC)".
+    - "TIME OF EVENT (UTC)"
+    - "HORA DEL EVENTO (UTC)"
+    - "EVENT TIME (UTC)"
+    - "EVENT DATE"
+    - "FECHA DEL EVENTO"
+  event_type:
+    - "EVENT TYPE"
+    - "TIPO DE EVENTO"
+  equipment_status:
+    # Verified against a real report: the label is "Equipment Condition".
+    - "EQUIPMENT CONDITION"
+    - "ESTADO DEL EQUIPO"
+    - "EQUIPMENT STATUS"
+  possible_cause:
+    - "POSSIBLE CAUSE"
+    - "POSIBLE CAUSA"
+  recommended_action:
+    - "RECOMMENDED ACTION"
+    - "ACCION RECOMENDADA"
+  urgency:
+    - "URGENCY"
+    - "URGENCIA"
+
+# Fragments removed from any extracted value. The report glues a help link to the
+# event timestamp ("21-07-2026 20:14 ¿Qué es UTC?"), which would otherwise end up
+# in the email.
+value_noise:
+  - "¿Qué es UTC?"
+  - "What is UTC?"

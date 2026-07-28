@@ -1,0 +1,12 @@
+# Only needed if the attached PDF is to be translated, which is OUT OF SCOPE in
+# the current design: the report travels in Spanish in the email body and the
+# original PDF is attached untranslated. See PROPUESTA-INFORMES.md.
+#
+# Install only when switching translation.provider away from "none":
+#   pip install -r requirements-optional.txt
+
+# translation.provider: "google"  — billed per page (~USD 0.08)
+google-cloud-translate>=3.15.0
+
+# translation.provider: "deepl"   — bills a 50,000-character minimum per file
+deepl>=1.18.0

@@ -1,0 +1,22 @@
+# OPTIONAL. Leave it empty and every draft is created without a recipient, which
+# is the normal flow: the technician adds the address and the contact name from
+# memory before sending. Outlook will not send a message with an empty To field,
+# so an unfinished draft can never go out by accident.
+#
+# Fill an entry in only when a client's address is always the same and you want
+# it pre-loaded. Matching is case- and accent-insensitive against the COMPANY /
+# PLANT field extracted from the PDF, and longer patterns win.
+#
+#   clients:
+#     - match: ["cliente-a"]
+#       display_name: "Cliente A"
+#       to: ["operaciones@cliente-a.example"]
+#       cc: []
+
+clients: []
+
+# Always copied when the report urgency matches settings.yaml -> urgency.critical_values
+critical_cc: []
+
+# Copied on every draft, regardless of client. Useful for an internal archive mailbox.
+always_cc: []
