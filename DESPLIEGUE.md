@@ -84,10 +84,36 @@ forma de hablarle.
 
 ## 2. Instalar Python
 
-- [ ] Ejecutar el instalador de Python.
+**Lo más rápido, desde la consola.** Windows 11 ya trae `winget`:
+
+```cmd
+winget install Python.Python.3.12 --accept-package-agreements --accept-source-agreements
+```
+
+Instala sin pantallas y deja el PATH puesto. Después hay que **cerrar la ventana de
+CMD y abrir una nueva**, y verificar con `python --version`.
+
+Se elige 3.12 y no la última: es la versión con la que están probadas `pywin32` y
+`pymupdf`, las dos librerías que hacen el trabajo pesado. El equipo de producción no
+es el lugar para estrenar una versión.
+
+**Node.js no hace falta.** El proyecto es Python puro: ni un archivo JavaScript, ni
+`package.json`. Y no podría haberlo, porque Outlook renderiza con el motor de Word,
+que ignora JavaScript.
+
+### Si winget no está o falla
+
+Puede pasar con un App Installer viejo o por política de la empresa.
+
+- [ ] Ejecutar el instalador de [python.org](https://www.python.org/downloads/windows/).
 - [ ] En la **primera pantalla**, antes de apretar Install, marcar la casilla de
       abajo que dice **"Add python.exe to PATH"**. Es la más importante de toda la
       instalación: sin ella, ningún comando de acá funciona.
+- [ ] Si pide permisos de administrador y no los hay: **Customize installation** y
+      desmarcar *"Install for all users"*. Instala solo para ese usuario y sirve
+      igual.
+- [ ] **No instalarlo desde la Microsoft Store.** Esa versión corre aislada y da
+      problemas justo con `pywin32`, que es la librería que le habla a Outlook.
 - [ ] Terminar la instalación.
 - [ ] **Cerrar la ventana de CMD y abrir una nueva** (los cambios de PATH solo
       aplican a ventanas nuevas).
@@ -150,12 +176,25 @@ pide, usá `C:\Users\<usuario>\clariot`, que tampoco se sincroniza.
 - [ ] Verificar que la ruta final sea `C:\clariot\config`, y **no**
       `C:\clariot\clariot-main\config`. Si quedó anidada, nada va a funcionar.
 
+> **Ojo con `C:\Users`.** Clonar ahí falla con
+> `fatal: could not create work tree dir`, porque es una carpeta protegida de
+> Windows y no se puede escribir sin administrador. Pasó en una instalación
+> real. `C:\Users` guarda perfiles; la carpeta va en `C:\clariot`, o dentro
+> del perfil del usuario (`C:\Users\<usuario>\clariot`), que sí es escribible.
+
 **Opción B — con Git**, si el equipo ya lo tiene:
 
 ```cmd
 cd /d C:\
 git clone <URL-DEL-REPO> clariot
 ```
+
+El nombre al final renombra la carpeta al clonar; sin él queda con el nombre del
+repositorio. Siendo un repositorio privado, Git va a pedir autenticación: abre una
+ventana del navegador para entrar con la cuenta de GitHub. Si en cambio pide usuario
+y contraseña en la consola, la contraseña de GitHub ya no sirve desde 2021 y hay que
+generar un token en Settings → Developer settings → Personal access tokens, con
+permiso `repo`.
 
 ## 4. Instalar el programa
 
