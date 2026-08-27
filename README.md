@@ -78,20 +78,47 @@ principio: en muchas empresas conseguir un registro de aplicación es imposible.
 Todo se ejecuta en **CMD**, el símbolo del sistema de Windows. Para abrirlo:
 `Windows + R`, escribir `cmd`, Enter.
 
-> **CMD y no PowerShell**, a propósito: PowerShell bloquea por defecto la ejecución
-> de scripts, y eso obliga a un permiso extra que en CMD no hace falta. Si preferís
-> PowerShell, el único cambio es activar el entorno con
-> `.\.venv\Scripts\Activate.ps1` en lugar del `.bat`.
+> **CMD y no PowerShell.** No es preferencia: en PowerShell, `activate.bat`
+> **falla en silencio**. Un `.bat` corre en un proceso hijo, hace su trabajo y
+> muere sin devolverle las variables al PowerShell padre. No da error, no aparece
+> `(.venv)`, y los `pip install` siguientes se instalan en el Python del sistema
+> sin avisar. Pasó en una instalación real y costó media hora.
+>
+> Si necesitás PowerShell, el equivalente es `.\.venv\Scripts\Activate.ps1` — otro
+> archivo, no el `.bat`.
 
 Para instalarlo en el equipo de un técnico que no tiene nada instalado, seguí
 **[DESPLIEGUE.md](DESPLIEGUE.md)**: es este mismo camino, con checklist y con las
 pantallas del instalador de Python explicadas una por una.
 
+### Qué hay que tener a mano antes de empezar
+
+Cuatro cosas. Sin la tercera la instalación se traba en el paso 7:
+
+| | Qué | Dónde se consigue |
+| --- | --- | --- |
+| 1 | **Outlook clásico** instalado y con la cuenta que recibe las alertas | Viene con Microsoft 365. Se verifica con `reg query HKEY_CLASSES_ROOT\Outlook.Application\CLSID` |
+| 2 | **Acceso al repositorio** | La cuenta de GitHub con permiso, o el ZIP descargado |
+| 3 | **La clave de Gemini** | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) — gratis, sin tarjeta. **No viene en el repositorio** |
+| 4 | **Un PDF de alerta real** | Para la prueba del final, si todavía no llegó ninguna al buzón |
+
 ### Paso 1 — Instalar Python
 
-Descargalo de [python.org](https://www.python.org/downloads/windows/) y, en la
-**primera pantalla** del instalador, marcá la casilla **"Add python.exe to PATH"**.
-Es la más importante: sin ella no funciona ningún comando de acá.
+Lo más rápido, desde la consola. Windows 11 ya trae `winget`:
+
+```cmd
+winget install Python.Python.3.12 --accept-package-agreements --accept-source-agreements
+```
+
+Instala sin pantallas y deja el PATH puesto. **Se elige 3.12 y no la última**: es la
+versión con la que están probadas `pywin32` y `pymupdf`, las dos librerías que hacen
+el trabajo pesado.
+
+Si `winget` no está o falla, bajalo de
+[python.org](https://www.python.org/downloads/windows/) y en la **primera pantalla**
+marcá la casilla **"Add python.exe to PATH"**. Es la más importante: sin ella no
+funciona ningún comando de acá. Y **no lo instales desde la Microsoft Store** — esa
+versión corre aislada y da problemas justo con `pywin32`.
 
 Cerrá la ventana de CMD, abrí una nueva —los cambios de PATH solo aplican a
 ventanas nuevas— y verificá:
@@ -100,7 +127,7 @@ ventanas nuevas— y verificá:
 python --version
 ```
 
-Tiene que responder `Python 3.10` o superior. Si dice "no se reconoce como un
+Tiene que responder `Python 3.12` o similar. Si dice "no se reconoce como un
 comando interno o externo", la casilla del PATH no quedó marcada.
 
 ### Paso 2 — Bajar el proyecto
@@ -110,6 +137,18 @@ cd /d C:\
 git clone <URL-DEL-REPO> clariot
 cd clariot
 ```
+
+> **No clones dentro de `C:\Users`.** Falla con
+> `fatal: could not create work tree dir`: es una carpeta protegida de Windows y no
+> se puede escribir sin administrador. `C:\Users` guarda perfiles. La carpeta va en
+> `C:\clariot`, o dentro del perfil (`C:\Users\<usuario>\clariot`), que sí es
+> escribible.
+
+Siendo un repositorio privado, Git pide autenticación: abre una ventana del
+navegador para entrar con la cuenta de GitHub. Si en cambio pide usuario y
+contraseña en la consola, la contraseña de GitHub ya no sirve desde 2021 — hay que
+generar un token en Settings → Developer settings → Personal access tokens, con
+permiso `repo`.
 
 Sin Git instalado: descargá el ZIP del repositorio, descomprimilo y movelo a
 `C:\clariot`.
