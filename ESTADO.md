@@ -1,14 +1,22 @@
-# Estado del proyecto — 31 de julio de 2026
+# Estado del proyecto
 
-Documento de continuidad. Qué está hecho, qué se decidió y por qué, y qué falta.
-
-> **El sistema funciona de punta a punta, está probado contra Outlook real y ya
-> está instalado y corriendo en el equipo de un técnico.** 166 tests automatizados
-> en verde, más una prueba de carga de 20 alertas contra Outlook real. El código
-> vive en un repositorio privado.
+> ### ¿Venís a instalarlo? Este no es el documento.
 >
-> Para instalarlo en otro equipo: **[DESPLIEGUE.md](DESPLIEGUE.md)**, que es un
-> checklist desde cero, o la sección 3 del README.
+> El paso a paso está en **[DESPLIEGUE.md](DESPLIEGUE.md)** — 11 pasos numerados
+> desde un equipo sin nada instalado, con las verificaciones de cada uno y una
+> tabla de qué hacer si algo falla. La versión corta está en la sección 3 del
+> [README](README.md).
+>
+> **Este archivo es otra cosa:** el registro de qué se decidió, por qué, y qué se
+> aprendió rompiendo cosas. Se lee cuando hay que *cambiar* el sistema o entender
+> por qué está hecho así, no cuando hay que instalarlo.
+
+Última revisión: 31 de julio de 2026.
+
+El sistema funciona de punta a punta y está probado contra Outlook real: 166 tests
+automatizados en verde, más una prueba de carga de 20 alertas. El código vive en un
+repositorio privado, y hay **una instalación en producción** en el equipo de un
+técnico (el detalle, en la sección 5).
 
 ---
 
@@ -523,10 +531,17 @@ permisivo por costumbre sería justamente el error.
 
 ## 7. Los documentos del proyecto
 
-| Archivo | Para qué |
-| --- | --- |
-| `DESPLIEGUE.md` | **Checklist para instalar en el PC del técnico** |
-| `INSTALACION.md` | Manual operativo (pendiente de actualizar, punto 3 de la sección 5) |
-| `README.md` | Panorama técnico |
-| `PROPUESTA-INFORMES.md` | El razonamiento del diseño de informes |
-| `ESTADO.md` | Este documento |
+Ordenados por cuándo se leen, no por importancia:
+
+| Si querés... | Leé | Qué es |
+| --- | --- | --- |
+| Entender qué hace esto | `README.md` | La puerta de entrada: qué resuelve, requisitos, instalación resumida, comandos y límites conocidos |
+| **Instalarlo en un equipo** | **`DESPLIEGUE.md`** | El checklist: 11 pasos desde un equipo sin nada, cada uno con su verificación, y una tabla de síntomas y causas |
+| Operarlo día a día, o algo falla | `INSTALACION.md` | El manual largo: el glosario, la traducción, el informe semanal, y 13 secciones de detalle |
+| Saber por qué los informes son así | `PROPUESTA-INFORMES.md` | El razonamiento del diseño, con ejemplos del correo |
+| Cambiar algo, o entender una decisión | `ESTADO.md` | Este documento |
+
+**Regla para quien edite estos archivos:** el paso a paso vive en **un solo lugar**,
+`DESPLIEGUE.md`, con una versión resumida en el README. No lo copies a un tercer
+documento: tres copias se desincronizan, y a partir de ahí nadie sabe cuál es la
+buena.
