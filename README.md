@@ -102,6 +102,25 @@ Cuatro cosas. Sin la tercera la instalación se traba en el paso 7:
 | 3 | **La clave de Gemini** | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) — gratis, sin tarjeta. **No viene en el repositorio** |
 | 4 | **Un PDF de alerta real** | Para la prueba del final, si todavía no llegó ninguna al buzón |
 
+### Lo único que NO se automatiza
+
+De toda la instalación, **solo dos cosas las tiene que hacer una persona a mano**.
+Todo lo demás es un comando.
+
+| | Qué | Por qué no se automatiza |
+| --- | --- | --- |
+| 1 | **Pegar la clave de Gemini** en `.env` (paso 5) | Es un secreto. No viaja en el repositorio ni puede, y sin ella el programa no arranca |
+| 2 | **Crear la regla de Outlook** (paso 8) | Se crea del lado del servidor, desde el navegador, para que funcione con el equipo apagado. El programa no toca las reglas del buzón |
+
+Las **carpetas sí se crean solas** con `--setup-folders`, y las bases de datos y
+carpetas de trabajo se generan en la primera corrida. No hay que crear nada a mano
+en el disco.
+
+Si al terminar la instalación algo no funciona, empezá por esas dos: en la práctica
+son el origen de casi todas las fallas. Sin la clave, `--self-check` se detiene en
+el paso 7. Sin la regla, las alertas nunca llegan a la carpeta y el programa corre
+sobre una carpeta vacía sin quejarse — porque para él, no tener alertas es normal.
+
 ### Paso 1 — Instalar Python
 
 Lo más rápido, desde la consola. Windows 11 ya trae `winget`:

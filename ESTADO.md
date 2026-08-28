@@ -1,11 +1,14 @@
-# Estado del proyecto — 28 de julio de 2026
+# Estado del proyecto — 31 de julio de 2026
 
 Documento de continuidad. Qué está hecho, qué se decidió y por qué, y qué falta.
 
-> **El sistema funciona de punta a punta y está probado contra Outlook real.**
-> 164 tests automatizados en verde, más una prueba de carga de 20 alertas contra
-> Outlook real. **El código ya está en el repositorio privado.** Falta un solo
-> paso: desplegarlo en el equipo del técnico siguiendo `DESPLIEGUE.md`.
+> **El sistema funciona de punta a punta, está probado contra Outlook real y ya
+> está instalado y corriendo en el equipo de un técnico.** 166 tests automatizados
+> en verde, más una prueba de carga de 20 alertas contra Outlook real. El código
+> vive en un repositorio privado.
+>
+> Para instalarlo en otro equipo: **[DESPLIEGUE.md](DESPLIEGUE.md)**, que es un
+> checklist desde cero, o la sección 3 del README.
 
 ---
 
@@ -402,16 +405,45 @@ Esto **solo bloquea la traducción del PDF**. Todo lo demás funciona.
 - **Código muerto eliminado:** `templates/alert_email.html.j2`, sobrante del diseño
   en que una alarma era un correo.
 
-### Por hacer, en orden
+### Lo único que no se automatiza, en cualquier instalación
 
-1. **Instalar en el equipo del técnico**, siguiendo `DESPLIEGUE.md`. No depende de
-   nada de lo anterior.
-2. **La regla en el buzón del técnico**, por remitente `support@aliotportal.com`,
-   creada desde el navegador para que quede del lado del servidor.
-3. **La traducción del PDF**, cuando la facturación se resuelva. Es una línea:
+Verificado contra el código: **dos pasos son irreduciblemente humanos**, y el resto
+es un comando.
+
+| | Qué | Por qué |
+| --- | --- | --- |
+| 1 | Pegar la clave de Gemini en `.env` | Es un secreto: no viaja en el repositorio ni puede |
+| 2 | Crear la regla de Outlook | No hay una línea en `src/` que toque la colección `Rules` del buzón. Se crea del lado del servidor, desde el navegador, para que funcione con el equipo apagado |
+
+Las carpetas del buzón **sí** se crean solas con `--setup-folders`, y `state/`,
+`logs/` y `archive/` aparecen en la primera corrida. En el disco no hay que crear
+nada a mano.
+
+Cuando algo falla después de instalar, el origen casi siempre es uno de esos dos.
+Sin la clave, `--self-check` se detiene. Sin la regla, el programa corre sobre una
+carpeta vacía **sin quejarse**, porque para él no tener alertas es una situación
+normal — y eso es lo que lo hace difícil de diagnosticar.
+
+### Estado del despliegue
+
+Primera instalación completada en el equipo de un técnico: Outlook clásico, Python
+3.12, el repositorio, el entorno virtual, las dependencias, la clave, las carpetas y
+`--self-check` devolviendo `Todo listo`. La regla quedó creada.
+
+Falta cerrar tres cosas, ninguna bloqueante:
+
+1. **Probar que la regla mueve sola.** Hasta ahora los correos se movieron a mano, así
+   que la regla está creada pero no demostrada. Se prueba marcando "Ejecutar regla
+   ahora", o esperando la próxima alerta real.
+2. **El acceso directo en el escritorio**, para que el uso diario no pida consola.
+3. **La traducción del PDF**, cuando se resuelva la facturación. Es una línea:
    `translation.provider: "google"`.
 
-Todo lo demás está hecho, documentado y probado.
+Y una duda abierta de la primera corrida real: dos alertas del mismo equipo dejaron
+un solo PDF adjunto. El caso se reprodujo en banco de pruebas con dos alarmas y los
+dos PDF con el mismo nombre de archivo, y **adjuntó los dos**, así que el camino
+funciona. Se resuelve mirando `archiveudit.csv`: si una fila dice `reenvio`, los
+dos correos describían el mismo evento y el comportamiento fue el correcto.
 
 ### Limpieza hecha al cerrar
 
