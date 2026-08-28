@@ -434,23 +434,25 @@ normal — y eso es lo que lo hace difícil de diagnosticar.
 
 ### Estado del despliegue
 
-Primera instalación completada en el equipo de un técnico: Outlook clásico, Python
-3.12, el repositorio, el entorno virtual, las dependencias, la clave, las carpetas y
-`--self-check` devolviendo `Todo listo`. La regla quedó creada.
+**El sistema está en producción y funcionando sin intervención.** Primera
+instalación completada en el equipo de un técnico: Outlook clásico, Python 3.12, el
+repositorio, el entorno virtual, las dependencias, la clave y las carpetas, con
+`--self-check` devolviendo `Todo listo`.
 
-Falta cerrar tres cosas, ninguna bloqueante:
+La regla del servidor **quedó probada con alertas reales**: los correos de
+`support@aliotportal.com` llegan solos a la carpeta de origen, el programa los
+procesa y deja el borrador. El ciclo completo corre sin que nadie mueva nada a mano.
 
-1. **Probar que la regla mueve sola.** Hasta ahora los correos se movieron a mano, así
-   que la regla está creada pero no demostrada. Se prueba marcando "Ejecutar regla
-   ahora", o esperando la próxima alerta real.
-2. **El acceso directo en el escritorio**, para que el uso diario no pida consola.
-3. **La traducción del PDF**, cuando se resuelva la facturación. Es una línea:
+Quedan dos cosas, ninguna bloqueante:
+
+1. **El acceso directo en el escritorio**, para que el uso diario no pida consola.
+2. **La traducción del PDF**, cuando se resuelva la facturación. Es una línea:
    `translation.provider: "google"`.
 
 Y una duda abierta de la primera corrida real: dos alertas del mismo equipo dejaron
 un solo PDF adjunto. El caso se reprodujo en banco de pruebas con dos alarmas y los
 dos PDF con el mismo nombre de archivo, y **adjuntó los dos**, así que el camino
-funciona. Se resuelve mirando `archiveudit.csv`: si una fila dice `reenvio`, los
+funciona. Se resuelve mirando `archive\audit.csv`: si una fila dice `reenvio`, los
 dos correos describían el mismo evento y el comportamiento fue el correcto.
 
 ### Limpieza hecha al cerrar
